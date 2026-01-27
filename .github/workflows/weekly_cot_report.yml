@@ -3,7 +3,7 @@ name: Weekly EEX CoT Report
 on:
   schedule:
     # Run every Tuesday at 10:00 AM UTC (adjust to your timezone)
-    - cron: '0 10 * * 2'
+    - cron: '0 12 * * 2'
 
   # Allow manual trigger
   workflow_dispatch:
