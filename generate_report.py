@@ -5,7 +5,7 @@ import sys
 import webbrowser
 from pathlib import Path
 from eex_storage import EEXDataStorage
-from eex_html_report import EEXHTMLReport
+from eex_html_report_tabbed import EEXHTMLReportTabbed
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
     print("=" * 80)
 
     storage = EEXDataStorage()
-    report_gen = EEXHTMLReport()
+    report_gen = EEXHTMLReportTabbed()
 
     # Collect data
     contracts_data = {}

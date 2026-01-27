@@ -30,7 +30,7 @@ jobs:
 
     - name: Run EEX CoT Workflow
       run: |
-        python eex_workflow.py DEBM DEPM --weeks 13
+        python eex_workflow.py DEBM DEPM F7BM F9BM FCBM FDBM FEBM FEUA G0BM G3BM G5BM G8BM --weeks 13
 
     - name: Update index page
       run: |

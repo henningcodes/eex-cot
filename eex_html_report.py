@@ -21,6 +21,21 @@ class EEXHTMLReport:
         'compliance_operators': 'Compliance Operators'
     }
 
+    CONTRACT_NAMES = {
+        'DEBM': 'German Power Baseload',
+        'DEPM': 'German Power Peak',
+        'F7BM': 'French Power Baseload',
+        'F9BM': 'Spanish Power Baseload',
+        'FCBM': 'Czech Power Baseload',
+        'FDBM': 'Nordic Power Baseload',
+        'FEBM': 'Italian Power Baseload',
+        'FEUA': 'EU Emission Allowances (EUA)',
+        'G0BM': 'TTF Natural Gas',
+        'G3BM': 'NCG Natural Gas (THE)',
+        'G5BM': 'PEG Natural Gas',
+        'G8BM': 'PSV Natural Gas'
+    }
+
     def __init__(self, output_dir: str = "reports"):
         """
         Initialize HTML report generator.

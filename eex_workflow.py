@@ -18,7 +18,7 @@ from eex_parser import EEXCoTParser
 from eex_storage import EEXDataStorage
 from eex_analyzer import EEXAnalyzer
 from eex_visualizer import EEXVisualizer
-from eex_html_report import EEXHTMLReport
+from eex_html_report_tabbed import EEXHTMLReportTabbed
 
 
 class EEXWorkflow:
@@ -127,7 +127,7 @@ class EEXWorkflow:
         print("\n[STEP 5/6] Generating HTML report...")
         print("-" * 80)
 
-        report_gen = EEXHTMLReport()
+        report_gen = EEXHTMLReportTabbed()
 
         # Collect data for all contracts
         contracts_data = {}
