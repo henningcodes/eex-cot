@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEX Commitment of Traders Reports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .intro {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .intro h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .intro p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .reports-section {
+            margin-top: 30px;
+        }
+
+        .reports-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .report-list {
+            list-style: none;
+        }
+
+        .report-item {
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .report-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .report-item a {
+            display: block;
+            padding: 20px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .report-date {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .report-contracts {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .instructions {
+            margin-top: 40px;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .auto-reports {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .auto-reports strong {
+            color: #856404;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .no-reports {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-reports p {
+            margin-bottom: 15px;
+        }
+
+        .no-reports code {
+            background: #f8f9fa;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 EEX Commitment of Traders</h1>
+            <p>Weekly Position Reports - European Energy Exchange</p>
+        </div>
+
+        <div class="content">
+            <div class="intro">
+                <h2>About These Reports</h2>
+                <p>
+                    These reports provide weekly analysis of trader positioning in EEX energy futures contracts.
+                    Data includes positions for Investment Firms, Investment Funds, Commercial entities, and other
+                    market participants, along with weekly changes and historical trends.
+                </p>
+            </div>
+
+            <div class="reports-section">
+                <h2>Available Reports</h2>
+
+                <ul class="report-list">
+                    <li class="report-item">
+                        <a href="cot_report_20260123.html">
+                            <div class="report-date">January 23, 2026</div>
+                            <div class="report-contracts">Contracts: DEBM, DEPM</div>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Reports will be listed here dynamically -->
+                <!-- This is a static index page. For dynamic listing, you'd need JavaScript or server-side processing -->
+
+                
+            </div>
+
+            <div class="instructions">
+                <h3>📌 How to Use</h3>
+                <p><strong>Automated Reports:</strong> New reports are automatically generated every Tuesday when data is published by EEX.</p>
+                <p><strong>Report Contents:</strong> Each report includes current positions, weekly changes, and historical charts for all tracked contracts.</p>
+                <p><strong>Accessing Reports:</strong> Click on any report date above to view the full analysis.</p>
+            </div>
+
+            <div class="auto-reports">
+                <strong>🤖 Automated Workflow:</strong> This system runs automatically via GitHub Actions every Tuesday.
+                Latest reports are published here within minutes of EEX data availability.
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Data Source:</strong> European Energy Exchange (EEX) - MiFID II RTS 21</p>
+            <p>Generated automatically • Last updated: <span id="last-updated">--</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Display last updated time
+        document.getElementById('last-updated').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Automatically detect and list reports (if running on a web server)
+        // For GitHub Pages, reports should be manually linked or use a reports.json file
+    </script>
+</body>
+</html>
