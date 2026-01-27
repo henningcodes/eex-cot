@@ -424,10 +424,14 @@ class EEXHTMLReport:
         if not chart_path.exists():
             return f'<p>Chart not found: {chart_path}</p>'
 
+        # Use relative path for web deployment
+        # Assumes plots are copied to reports/plots/
+        relative_path = f"./plots/{chart_path.name}"
+
         html = f"""
         <div class="chart-container">
             <div class="chart-title">{title}</div>
-            <img src="{chart_path.absolute().as_uri()}" alt="{title}">
+            <img src="{relative_path}" alt="{title}">
         </div>
         """
 

@@ -36,6 +36,11 @@ jobs:
       run: |
         python update_index.py
 
+    - name: Copy plots to reports directory
+      run: |
+        mkdir -p reports/plots
+        cp -r plots/*.png reports/plots/ || true
+
     - name: Commit and push results
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
