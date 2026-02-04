@@ -33,8 +33,8 @@ def update_index():
             report_date = datetime.strptime(date_str, '%Y%m%d')
             formatted_date = report_date.strftime('%B %d, %Y')
 
-            # Determine contracts (assume DEBM, DEPM for now - could be read from file)
-            contracts = 'DEBM, DEPM'
+            # Determine contracts (assume all contracts for now)
+            contracts = 'All Contracts'
 
             report_list_html += f'''                    <li class="report-item">
                         <a href="{report_file.name}">
@@ -51,26 +51,29 @@ def update_index():
     with open(index_file, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # Replace the no-reports section with actual report list
-    if len(report_files) > 0:
-        # Remove no-reports div and add report list
-        content = re.sub(
-            r'<div class="no-reports">.*?</div>',
-            report_list_html,
-            content,
-            flags=re.DOTALL
-        )
+    # Replace the existing report list (ul.report-list) with new list
+    content = re.sub(
+        r'<ul class="report-list">.*?</ul>',
+        report_list_html,
+        content,
+        flags=re.DOTALL
+    )
 
-        # Also remove the commented example if present
-        content = re.sub(
-            r'<!--\s*<ul class="report-list">.*?</ul>\s*-->',
-            '',
-            content,
-            flags=re.DOTALL
-        )
+    # Also handle the no-reports div if present
+    content = re.sub(
+        r'<div class="no-reports">.*?</div>',
+        report_list_html,
+        content,
+        flags=re.DOTALL
+    )
 
-    # Update last updated timestamp
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # Remove any HTML comments about dynamic listing
+    content = re.sub(
+        r'<!--\s*Reports will be listed here dynamically\s*-->.*?<!--[^>]*-->',
+        '',
+        content,
+        flags=re.DOTALL
+    )
 
     # Write updated index
     with open(index_file, 'w', encoding='utf-8') as f:
