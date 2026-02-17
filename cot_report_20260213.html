@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoT Report - Multi-Contract</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        /* Tab Styles */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            border-bottom: 2px solid #667eea;
+            padding: 10px 10px 0 10px;
+            gap: 5px;
+        }
+
+        .tab-button {
+            background: #e0e0e0;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #555;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            background: #d0d0d0;
+            color: #333;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .contract-header-inline {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .contract-header-inline h2 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+        }
+
+        .contract-info {
+            font-size: 0.95em;
+            opacity: 0.95;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .card-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card-unit {
+            font-size: 0.8em;
+            color: #666;
+            margin-left: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table caption {
+            font-size: 1.3em;
+            font-weight: bold;
+            padding: 15px;
+            text-align: left;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        th.number {
+            text-align: right;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        td.number {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .positive {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .negative {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .neutral {
+            color: #95a5a6;
+        }
+
+        .charts {
+            margin-top: 40px;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .chart-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .timestamp {
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            .tabs {
+                display: none;
+            }
+
+            .tab-content {
+                display: block !important;
+                page-break-after: always;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                border-radius: 4px;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+    <script>
+        function openTab(evt, contractName) {
+            var i, tabcontent, tabbuttons;
+
+            // Hide all tab content
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Remove active class from all buttons
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].className = tabbuttons[i].className.replace(" active", "");
+            }
+
+            // Show current tab and mark button as active
+            document.getElementById(contractName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Commitment of Traders Report</h1>
+        <div class="subtitle">European Energy Exchange (EEX) - Report Date: 2026-02-13</div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab(event, 'DEBM')">DEBM - German Power Baseload</button>
+        <button class="tab-button" onclick="openTab(event, 'DEPM')">DEPM - German Power Peak</button>
+        <button class="tab-button" onclick="openTab(event, 'F7BM')">F7BM - French Power Baseload</button>
+        <button class="tab-button" onclick="openTab(event, 'F9BM')">F9BM - Spanish Power Baseload</button>
+        <button class="tab-button" onclick="openTab(event, 'FCBM')">FCBM - Czech Power Baseload</button>
+        <button class="tab-button" onclick="openTab(event, 'FDBM')">FDBM - Nordic Power Baseload</button>
+        <button class="tab-button" onclick="openTab(event, 'FEBM')">FEBM - Italian Power Baseload</button>
+        <button class="tab-button" onclick="openTab(event, 'FEUA')">FEUA - EU Emission Allowances (EUA)</button>
+        <button class="tab-button" onclick="openTab(event, 'G0BM')">G0BM - TTF Natural Gas</button>
+        <button class="tab-button" onclick="openTab(event, 'G3BM')">G3BM - NCG Natural Gas (THE)</button>
+        <button class="tab-button" onclick="openTab(event, 'G5BM')">G5BM - PEG Natural Gas</button>
+        <button class="tab-button" onclick="openTab(event, 'G8BM')">G8BM - PSV Natural Gas</button>
+    </div>
+
+
+    <div id="DEBM" class="tab-content" style="display:block">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>DEBM - German Power Baseload</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">297,167,038<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">297,167,038<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">0<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">248,010,406</td>
+                    <td class="number">225,204,020</td>
+                    <td class="number"><span class="positive">+22,806,386</span></td>
+                    <td class="number">83.46%</td>
+                    <td class="number">75.78%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">19,754,941</td>
+                    <td class="number">16,049,923</td>
+                    <td class="number"><span class="positive">+3,705,018</span></td>
+                    <td class="number">6.65%</td>
+                    <td class="number">5.40%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">472,411</td>
+                    <td class="number">378,339</td>
+                    <td class="number"><span class="positive">+94,072</span></td>
+                    <td class="number">0.16%</td>
+                    <td class="number">0.13%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">28,929,280</td>
+                    <td class="number">55,534,756</td>
+                    <td class="number"><span class="negative">-26,605,476</span></td>
+                    <td class="number">9.74%</td>
+                    <td class="number">18.69%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+3,284,801</span></td>
+                    <td class="number"><span class="positive">+506,960</span></td>
+                    <td class="number"><span class="positive">+2,777,841</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+3,330,090</span></td>
+                    <td class="number"><span class="positive">+1,402,997</span></td>
+                    <td class="number"><span class="positive">+1,927,093</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="negative">-148,344</span></td>
+                    <td class="number"><span class="negative">-33,615</span></td>
+                    <td class="number"><span class="negative">-114,729</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-5,579,283</span></td>
+                    <td class="number"><span class="negative">-989,078</span></td>
+                    <td class="number"><span class="negative">-4,590,205</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/DEBM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/DEBM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/DEBM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/DEBM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/DEBM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="DEPM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>DEPM - German Power Peak</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">28,500,840<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">28,473,600<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">27,240<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">26,665,260</td>
+                    <td class="number">25,305,216</td>
+                    <td class="number"><span class="positive">+1,360,044</span></td>
+                    <td class="number">93.54%</td>
+                    <td class="number">88.77%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">1,764,468</td>
+                    <td class="number">1,987,860</td>
+                    <td class="number"><span class="negative">-223,392</span></td>
+                    <td class="number">6.19%</td>
+                    <td class="number">6.97%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">71,112</td>
+                    <td class="number">1,180,524</td>
+                    <td class="number"><span class="negative">-1,109,412</span></td>
+                    <td class="number">0.25%</td>
+                    <td class="number">4.14%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+774,216</span></td>
+                    <td class="number"><span class="positive">+235,392</span></td>
+                    <td class="number"><span class="positive">+538,824</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+202,884</span></td>
+                    <td class="number"><span class="positive">+379,752</span></td>
+                    <td class="number"><span class="negative">-176,868</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-26,232</span></td>
+                    <td class="number"><span class="positive">+335,724</span></td>
+                    <td class="number"><span class="negative">-361,956</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/DEPM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/DEPM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/DEPM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/DEPM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/DEPM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="F7BM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>F7BM - French Power Baseload</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">214,468,435<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">214,500,596<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">-32,161<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">51,419,557</td>
+                    <td class="number">22,726,683</td>
+                    <td class="number"><span class="positive">+28,692,874</span></td>
+                    <td class="number">23.95%</td>
+                    <td class="number">10.59%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">21,219,716</td>
+                    <td class="number">26,070,325</td>
+                    <td class="number"><span class="negative">-4,850,609</span></td>
+                    <td class="number">9.88%</td>
+                    <td class="number">12.14%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">141,829,162</td>
+                    <td class="number">165,703,588</td>
+                    <td class="number"><span class="negative">-23,874,426</span></td>
+                    <td class="number">66.06%</td>
+                    <td class="number">77.18%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="positive">+413,770</span></td>
+                    <td class="number"><span class="negative">-1,332,680</span></td>
+                    <td class="number"><span class="positive">+1,746,450</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+1,923,760</span></td>
+                    <td class="number"><span class="positive">+558,909</span></td>
+                    <td class="number"><span class="positive">+1,364,851</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+3,282,478</span></td>
+                    <td class="number"><span class="positive">+6,391,910</span></td>
+                    <td class="number"><span class="negative">-3,109,432</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/F7BM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/F7BM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/F7BM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/F7BM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/F7BM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="F9BM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>F9BM - Spanish Power Baseload</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">19,858,796<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">20,117,276<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">-258,480<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">19,064,197</td>
+                    <td class="number">15,866,701</td>
+                    <td class="number"><span class="positive">+3,197,496</span></td>
+                    <td class="number">94.69%</td>
+                    <td class="number">78.81%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">398,232</td>
+                    <td class="number">93,541</td>
+                    <td class="number"><span class="positive">+304,691</span></td>
+                    <td class="number">1.98%</td>
+                    <td class="number">0.46%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">396,367</td>
+                    <td class="number">4,157,034</td>
+                    <td class="number"><span class="negative">-3,760,667</span></td>
+                    <td class="number">1.97%</td>
+                    <td class="number">20.65%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+38,046</span></td>
+                    <td class="number"><span class="negative">-101,110</span></td>
+                    <td class="number"><span class="positive">+139,156</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+520,882</span></td>
+                    <td class="number"><span class="positive">+436,709</span></td>
+                    <td class="number"><span class="positive">+84,173</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-149,272</span></td>
+                    <td class="number"><span class="positive">+57,979</span></td>
+                    <td class="number"><span class="negative">-207,251</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/F9BM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/F9BM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/F9BM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/F9BM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/F9BM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="FCBM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>FCBM - Czech Power Baseload</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">15,526,887<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">15,526,887<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">0<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">2,062,324</td>
+                    <td class="number">378,679</td>
+                    <td class="number"><span class="positive">+1,683,645</span></td>
+                    <td class="number">13.28%</td>
+                    <td class="number">2.44%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">474,181</td>
+                    <td class="number">65,638</td>
+                    <td class="number"><span class="positive">+408,543</span></td>
+                    <td class="number">3.05%</td>
+                    <td class="number">0.42%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">12,990,382</td>
+                    <td class="number">15,082,570</td>
+                    <td class="number"><span class="negative">-2,092,188</span></td>
+                    <td class="number">83.66%</td>
+                    <td class="number">97.14%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+71,824</span></td>
+                    <td class="number"><span class="positive">+33,449</span></td>
+                    <td class="number"><span class="positive">+38,375</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+4,257</span></td>
+                    <td class="number"><span class="negative">-3,208</span></td>
+                    <td class="number"><span class="positive">+7,465</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-25,606</span></td>
+                    <td class="number"><span class="positive">+20,714</span></td>
+                    <td class="number"><span class="negative">-46,320</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/FCBM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/FCBM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/FCBM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/FCBM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/FCBM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="FDBM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>FDBM - Nordic Power Baseload</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">54,571,907<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">54,739,469<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">-167,562<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">8,523,363</td>
+                    <td class="number">2,604,016</td>
+                    <td class="number"><span class="positive">+5,919,347</span></td>
+                    <td class="number">15.57%</td>
+                    <td class="number">4.76%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">5,723,428</td>
+                    <td class="number">7,488,315</td>
+                    <td class="number"><span class="negative">-1,764,887</span></td>
+                    <td class="number">10.45%</td>
+                    <td class="number">13.68%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">40,325,116</td>
+                    <td class="number">44,647,138</td>
+                    <td class="number"><span class="negative">-4,322,022</span></td>
+                    <td class="number">73.65%</td>
+                    <td class="number">81.55%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+1,458,016</span></td>
+                    <td class="number"><span class="negative">-176,303</span></td>
+                    <td class="number"><span class="positive">+1,634,319</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="negative">-1,905,137</span></td>
+                    <td class="number"><span class="negative">-1,546,752</span></td>
+                    <td class="number"><span class="negative">-358,385</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-1,008,330</span></td>
+                    <td class="number"><span class="positive">+261,599</span></td>
+                    <td class="number"><span class="negative">-1,269,929</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/FDBM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/FDBM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/FDBM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/FDBM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/FDBM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="FEBM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>FEBM - Italian Power Baseload</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">50,663,900<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">50,752,635<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">-88,735<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">44,126,725</td>
+                    <td class="number">39,650,619</td>
+                    <td class="number"><span class="positive">+4,476,106</span></td>
+                    <td class="number">86.89%</td>
+                    <td class="number">78.07%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">6,104,199</td>
+                    <td class="number">4,136,328</td>
+                    <td class="number"><span class="positive">+1,967,871</span></td>
+                    <td class="number">12.02%</td>
+                    <td class="number">8.14%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">432,976</td>
+                    <td class="number">6,965,688</td>
+                    <td class="number"><span class="negative">-6,532,712</span></td>
+                    <td class="number">0.85%</td>
+                    <td class="number">13.72%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+211,257</span></td>
+                    <td class="number"><span class="negative">-33,801</span></td>
+                    <td class="number"><span class="positive">+245,058</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+1,023,706</span></td>
+                    <td class="number"><span class="positive">+1,048,757</span></td>
+                    <td class="number"><span class="negative">-25,051</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-117,237</span></td>
+                    <td class="number"><span class="positive">+102,770</span></td>
+                    <td class="number"><span class="negative">-220,007</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/FEBM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/FEBM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/FEBM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/FEBM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/FEBM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="FEUA" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>FEUA - EU Emission Allowances (EUA)</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">72,136<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">72,143<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">-7<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">33,460</td>
+                    <td class="number">651</td>
+                    <td class="number"><span class="positive">+32,809</span></td>
+                    <td class="number">46.38%</td>
+                    <td class="number">0.90%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">14,350</td>
+                    <td class="number">3,280</td>
+                    <td class="number"><span class="positive">+11,070</span></td>
+                    <td class="number">19.89%</td>
+                    <td class="number">4.55%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">4</td>
+                    <td class="number">165</td>
+                    <td class="number"><span class="negative">-161</span></td>
+                    <td class="number">0.01%</td>
+                    <td class="number">0.23%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">24,322</td>
+                    <td class="number">68,048</td>
+                    <td class="number"><span class="negative">-43,725</span></td>
+                    <td class="number">33.71%</td>
+                    <td class="number">94.32%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="positive">+5,111</span></td>
+                    <td class="number"><span class="positive">+132</span></td>
+                    <td class="number"><span class="positive">+4,979</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-1,902</span></td>
+                    <td class="number"><span class="negative">-1,835</span></td>
+                    <td class="number"><span class="negative">-67</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="negative">-201</span></td>
+                    <td class="number"><span class="positive">+473</span></td>
+                    <td class="number"><span class="negative">-674</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+2,334</span></td>
+                    <td class="number"><span class="positive">+6,572</span></td>
+                    <td class="number"><span class="negative">-4,238</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/FEUA_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/FEUA_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/FEUA_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/FEUA_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/FEUA_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="G0BM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>G0BM - TTF Natural Gas</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">369,142,367<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">363,088,072<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">6,054,295<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">77,513,358</td>
+                    <td class="number">26,754,679</td>
+                    <td class="number"><span class="positive">+50,758,679</span></td>
+                    <td class="number">21.00%</td>
+                    <td class="number">7.25%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">57,233,635</td>
+                    <td class="number">60,158,311</td>
+                    <td class="number"><span class="negative">-2,924,676</span></td>
+                    <td class="number">15.50%</td>
+                    <td class="number">16.30%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">234,395,374</td>
+                    <td class="number">276,175,082</td>
+                    <td class="number"><span class="negative">-41,779,708</span></td>
+                    <td class="number">63.50%</td>
+                    <td class="number">74.82%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+629,128</span></td>
+                    <td class="number"><span class="negative">-1,615,564</span></td>
+                    <td class="number"><span class="positive">+2,244,692</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+2,832,476</span></td>
+                    <td class="number"><span class="positive">+3,301,920</span></td>
+                    <td class="number"><span class="negative">-469,444</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-1,218,251</span></td>
+                    <td class="number"><span class="positive">+457,780</span></td>
+                    <td class="number"><span class="negative">-1,676,031</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/G0BM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/G0BM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/G0BM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/G0BM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/G0BM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="G3BM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>G3BM - NCG Natural Gas (THE)</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">543,796,376<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">558,703,754<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">-14,907,378<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">424,645,778</td>
+                    <td class="number">305,762,988</td>
+                    <td class="number"><span class="positive">+118,882,790</span></td>
+                    <td class="number">75.88%</td>
+                    <td class="number">54.64%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">74,528,267</td>
+                    <td class="number">77,259,551</td>
+                    <td class="number"><span class="negative">-2,731,284</span></td>
+                    <td class="number">13.32%</td>
+                    <td class="number">13.81%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">44,622,331</td>
+                    <td class="number">175,681,215</td>
+                    <td class="number"><span class="negative">-131,058,884</span></td>
+                    <td class="number">7.97%</td>
+                    <td class="number">31.39%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+9,140,058</span></td>
+                    <td class="number"><span class="positive">+7,516,134</span></td>
+                    <td class="number"><span class="positive">+1,623,924</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-299,540</span></td>
+                    <td class="number"><span class="negative">-1,383,273</span></td>
+                    <td class="number"><span class="positive">+1,083,733</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="negative">-1,641,154</span></td>
+                    <td class="number"><span class="positive">+696,720</span></td>
+                    <td class="number"><span class="negative">-2,337,874</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/G3BM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/G3BM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/G3BM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/G3BM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/G3BM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="G5BM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>G5BM - PEG Natural Gas</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">102,270,356<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">98,880,836<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">3,389,520<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">32,881,703</td>
+                    <td class="number">12,870,639</td>
+                    <td class="number"><span class="positive">+20,011,064</span></td>
+                    <td class="number">28.90%</td>
+                    <td class="number">11.31%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">69,388,653</td>
+                    <td class="number">86,010,197</td>
+                    <td class="number"><span class="negative">-16,621,544</span></td>
+                    <td class="number">60.99%</td>
+                    <td class="number">75.59%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+648,259</span></td>
+                    <td class="number"><span class="positive">+435,983</span></td>
+                    <td class="number"><span class="positive">+212,276</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+433,012</span></td>
+                    <td class="number"><span class="positive">+259,152</span></td>
+                    <td class="number"><span class="positive">+173,860</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/G5BM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/G5BM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/G5BM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/G5BM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/G5BM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div>
+    <div id="G8BM" class="tab-content">
+        <div class="content">
+            <div class="contract-header-inline">
+                <h2>G8BM - PSV Natural Gas</h2>
+                <div class="contract-info">Report Date: 2026-02-13</div>
+            </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Long Positions</div>
+                <div class="card-value">62,417,866<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Short Positions</div>
+                <div class="card-value">51,925,067<span class="card-unit">MW</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Net Market Position</div>
+                <div class="card-value">10,492,799<span class="card-unit">MW</span></div>
+            </div>
+        </div>
+        
+        <table>
+            <caption>Current Positions by Category</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long (MW)</th>
+                    <th class="number">Short (MW)</th>
+                    <th class="number">Net (MW)</th>
+                    <th class="number">Long %</th>
+                    <th class="number">Short %</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number">17,034,014</td>
+                    <td class="number">819,609</td>
+                    <td class="number"><span class="positive">+16,214,405</span></td>
+                    <td class="number">27.21%</td>
+                    <td class="number">1.31%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number">9,273,090</td>
+                    <td class="number">3,457,478</td>
+                    <td class="number"><span class="positive">+5,815,612</span></td>
+                    <td class="number">14.81%</td>
+                    <td class="number">5.52%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number">0.00%</td>
+                    <td class="number">0.00%</td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number">36,110,762</td>
+                    <td class="number">47,647,980</td>
+                    <td class="number"><span class="negative">-11,537,218</span></td>
+                    <td class="number">57.67%</td>
+                    <td class="number">76.10%</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        <table>
+            <caption>Weekly Changes</caption>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Long Change (MW)</th>
+                    <th class="number">Short Change (MW)</th>
+                    <th class="number">Net Change (MW)</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td><strong>Commercial</strong></td>
+                    <td class="number"><span class="positive">+565,168</span></td>
+                    <td class="number"><span class="positive">+228,908</span></td>
+                    <td class="number"><span class="positive">+336,260</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Firms</strong></td>
+                    <td class="number"><span class="positive">+115,812</span></td>
+                    <td class="number"><span class="positive">+78,843</span></td>
+                    <td class="number"><span class="positive">+36,969</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Other Financial</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Compliance Operators</strong></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                    <td class="number"><span class="neutral">0</span></td>
+                </tr>
+            
+                <tr>
+                    <td><strong>Investment Funds</strong></td>
+                    <td class="number"><span class="negative">-255,592</span></td>
+                    <td class="number"><span class="negative">-181</span></td>
+                    <td class="number"><span class="negative">-255,411</span></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        <div class="charts">
+        <div class="chart-container">
+            <div class="chart-title">Net Positions by Category</div>
+            <img src="./plots/G8BM_net_positions_13w.png" alt="Net Positions by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Long/Short Breakdown by Category</div>
+            <img src="./plots/G8BM_breakdown_13w.png" alt="Long/Short Breakdown by Category">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Funds - Detailed Positions</div>
+            <img src="./plots/G8BM_investment_funds_13w.png" alt="Investment Funds - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Commercial - Detailed Positions</div>
+            <img src="./plots/G8BM_commercial_13w.png" alt="Commercial - Detailed Positions">
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Investment Firms - Detailed Positions</div>
+            <img src="./plots/G8BM_investment_firms_13w.png" alt="Investment Firms - Detailed Positions">
+        </div>
+        </div></div></div></div>
+    <div class="footer">
+        <p><strong>EEX Commitment of Traders Report</strong></p>
+        <p>Data Source: European Energy Exchange (EEX) - MiFID II RTS 21</p>
+        <p class="timestamp">Generated: 2026-02-17 12:56:29</p>
+    </div>
+</div>
+</body>
+</html>
