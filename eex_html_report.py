@@ -22,18 +22,36 @@ class EEXHTMLReport:
     }
 
     CONTRACT_NAMES = {
+        # Power Futures
+        'ATBM': 'Austrian Power Baseload',
         'DEBM': 'German Power Baseload',
         'DEPM': 'German Power Peak',
         'F7BM': 'French Power Baseload',
-        'F9BM': 'Spanish Power Baseload',
-        'FCBM': 'Czech Power Baseload',
-        'FDBM': 'Nordic Power Baseload',
-        'FEBM': 'Italian Power Baseload',
+        'F7PM': 'French Power Peakload',
+        'F9BM': 'Hungarian Power Baseload',
+        'FCBM': 'Swiss Power Baseload',
+        'FDBM': 'Italian Power Baseload',
+        'FEBM': 'Spanish Power Baseload',
         'FEUA': 'EU Emission Allowances (EUA)',
-        'G0BM': 'TTF Natural Gas',
-        'G3BM': 'NCG Natural Gas (THE)',
+        'FOBM': 'Japanese Tokyo Power Baseload',
+        'FQBM': 'Japanese Kansai Power Baseload',
+        'FXBM': 'Czech Power Baseload',
+        'Q0BM': 'Dutch Power Baseload',
+        'Q0PM': 'Dutch Power Peakload',
+        'Q1BM': 'Belgian Power Baseload',
+        # Natural Gas Futures
+        'G0BM': 'THE Natural Gas (Germany)',
+        'G3BM': 'TTF Natural Gas',
         'G5BM': 'PEG Natural Gas',
-        'G8BM': 'PSV Natural Gas'
+        'G8BM': 'CEGH VTP Natural Gas',
+        'GBBM': 'ZTP Natural Gas',
+        'GCBM': 'PSV Natural Gas',
+        'GEBM': 'PVB Natural Gas',
+        # Dry Bulk Freight Futures
+        'CPTM': 'Baltic Capesize 5TC Freight',
+        'P5TC': 'Baltic Panamax 5TC Freight',
+        'PTCM': 'Baltic Panamax 4TC Freight',
+        'SPTM': 'Baltic Supramax 10TC Freight',
     }
 
     def __init__(self, output_dir: str = "reports"):
