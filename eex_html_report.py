@@ -341,8 +341,10 @@ class EEXHTMLReport:
             (df['position_type'] == 'total')
         ].copy()
 
-        # Sort by net position descending
-        latest = latest.sort_values('net', ascending=False)
+        # Sort by fixed category order
+        category_order = ['commercial', 'investment_firms', 'investment_funds', 'other_financial', 'compliance_operators']
+        latest['_order'] = latest['category'].map({c: i for i, c in enumerate(category_order)})
+        latest = latest.sort_values('_order')
 
         html = """
         <table>
@@ -387,8 +389,10 @@ class EEXHTMLReport:
             (df['position_type'] == 'total')
         ].copy()
 
-        # Sort by net change descending
-        latest = latest.sort_values('net_change', ascending=False)
+        # Sort by fixed category order
+        category_order = ['commercial', 'investment_firms', 'investment_funds', 'other_financial', 'compliance_operators']
+        latest['_order'] = latest['category'].map({c: i for i, c in enumerate(category_order)})
+        latest = latest.sort_values('_order')
 
         html = """
         <table>
